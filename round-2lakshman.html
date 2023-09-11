@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tic Tac Toe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url('https://img.freepik.com/free-photo/painting-mountain-lake-with-mountain-background_188544-9126.jpg?w=2000');
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 5px;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            font-size: 24px;
+            text-align: center;
+            border: 2px solid #333;
+            cursor: pointer;
+            background-color: #ddd;
+            color: #333;
+        }
+        .cell.X {
+            color: #f00; /* Red for X */
+        }
+        .cell.O {
+            color: #00f; /* Blue for O */
+        }
+        .highlight {
+            background-color: #ff0; /* Yellow background for the winning cells */
+        }
+        #status {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        #message {
+            font-size: 24px;
+            margin-top: 20px;
+            display: none;
+        }
+        #emojis {
+            font-size: 48px;
+            margin-top: 20px;
+        }
+        button {
+            background-color: lightblue;
+            color: green;
+            border: 2px dashed blue;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="color:orangered;font-family:monospace;font-size:40px">Tic Tac Toe<span style="color:blue"> Game</span></h1>
+      <p id="status" style="color:yellow;">Player<span style="color:red;"> X's</span> Turn</p>
+    <div class="board" id="board">
+        <div class="cell" onclick="makeMove(0)"></div>
+        <div class="cell" onclick="makeMove(1)"></div>
+        <div class="cell" onclick="makeMove(2)"></div>
+        <div class="cell" onclick="makeMove(3)"></div>
+        <div class="cell" onclick="makeMove(4)"></div>
+        <div class="cell" onclick="makeMove(5)"></div>
+        <div class="cell" onclick="makeMove(6)"></div>
+        <div class="cell" onclick="makeMove(7)"></div>
+        <div class="cell" onclick="makeMove(8)"></div>
+    </div>
+
+    <div id="message"></div>
+    <div id="emojis"></div>
+    <button onclick="resetBoard()">Reset</button>
+
+    <script>
+        let currentPlayer = 'X';
+        let board = ['', '', '', '', '', '', '', '', ''];
+        let gameEnded = false;
+
+        const winPatterns = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+            [0, 4, 8], [2, 4, 6]             // Diagonals
+        ];
+
+        function makeMove(cellIndex) {
+            if (gameEnded || board[cellIndex] !== '') return;
+
+            board[cellIndex] = currentPlayer;
+            const cell = document.getElementById('board').children[cellIndex];
+            cell.textContent = currentPlayer;
+            cell.classList.add(currentPlayer);
+
+            if (checkWin()) {
+                document.getElementById('status').textContent = '';
+                document.getElementById('message').textContent = `Player ${currentPlayer} wins!`;
+                document.getElementById('message').style.display = 'block';
+                highlightWinningCells();
+                displayEmoji();
+                gameEnded = true;
+            } else if (board.every(cell => cell !== '')) {
+                document.getElementById('status').textContent = '';
+                document.getElementById('message').textContent = "It's a draw!";
+                document.getElementById('message').style.display = 'block';
+                displayEmoji();
+                gameEnded = true;
+            } else {
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                document.getElementById('status').textContent = `Player ${currentPlayer}'s Turn`;
+            }
+        }
+
+        function checkWin() {
+            for (const pattern of winPatterns) {
+                const [a, b, c] = pattern;
+                if (board[a] !== '' && board[a] === board[b] && board[a] === board[c]) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function highlightWinningCells() {
+            for (const pattern of winPatterns) {
+                const [a, b, c] = pattern;
+                const cellA = document.getElementById('board').children[a];
+                const cellB = document.getElementById('board').children[b];
+                const cellC = document.getElementById('board').children[c];
+
+                if (board[a] === board[b] && board[a] === board[c]) {
+                    cellA.classList.add('highlight');
+                    cellB.classList.add('highlight');
+                    cellC.classList.add('highlight');
+                }
+            }
+        }
+
+        function displayEmoji() {
+            const emojis = document.getElementById('emojis');
+            if (gameEnded) {
+                if (document.getElementById('message').textContent.includes("X wins")) {
+                    emojis.innerHTML = "🎉😄";
+                } else if (document.getElementById('message').textContent.includes("O wins")) {
+                    emojis.innerHTML = "😢😔";
+                } else {
+                    emojis.innerHTML = "😐🤷";
+                }
+            } else {
+                emojis.innerHTML = "";
+            }
+        }
+
+        function resetBoard() {
+            currentPlayer = 'X';
+            board = ['', '', '', '', '', '', '', '', ''];
+            gameEnded = false;
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                cell.textContent = '';
+                cell.classList.remove('X', 'O', 'highlight');
+            });
+            document.getElementById('status').textContent = "Player X's Turn";
+            document.getElementById('message').style.display = 'none';
+            document.getElementById('emojis').innerHTML = "";
+        }
+    </script>
+</body>
+</html>
